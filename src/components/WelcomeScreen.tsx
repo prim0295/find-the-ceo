@@ -16,7 +16,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
       '/assets/ceo-mistress-frame2.png',
       '/assets/ceo-mistress-frame3.png',
       '/assets/ceo-mistress-frame4.png',
-      '/crowd-images/crowd3.png'
+      '/crowd-images/crowd3.png',
+      '/assets/meme1.png',
+      '/assets/meme2.png',
+      '/assets/meme3.png',
+      '/assets/meme4.png',
+      '/assets/kiss-cam.png'
     ];
 
     let loaded = 0;
@@ -79,7 +84,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
           }} />
         </div>
         <div style={{ color: "#fff", fontSize: 18 }}>
-          Loading assets... {loadedImages}/5
+          Loading assets... {loadedImages}/10
         </div>
       </div>
     );

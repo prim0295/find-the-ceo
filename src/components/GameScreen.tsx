@@ -11,10 +11,14 @@ const FlashScreen = ({ onDone }: { onDone: () => void }) => {
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
-    // Play the first beep immediately
-    beepSound.play();
     let current = 5;
     setCountdown(current);
+    
+    // Play first beep after a short delay to avoid double playing
+    const firstBeep = setTimeout(() => {
+      beepSound.play();
+    }, 100);
+    
     const timer = setInterval(() => {
       current--;
       setCountdown(current);
@@ -23,12 +27,18 @@ const FlashScreen = ({ onDone }: { onDone: () => void }) => {
       }
       if (current <= 0) {
         clearInterval(timer);
-        setTimeout(onDone, 500);
+        // Play final longer beep before transitioning
+        setTimeout(() => {
+          beepSound.play();
+          setTimeout(onDone, 500);
+        }, 200);
       }
     }, 1000);
+    
     return () => {
       clearInterval(timer);
-      beepSound.stop(); // <-- Add this line to stop any playing beep
+      clearTimeout(firstBeep);
+      beepSound.stop();
     };
   }, [onDone]);
 
