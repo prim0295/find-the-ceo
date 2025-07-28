@@ -19,3 +19,63 @@ button {
   font-size: 1.2rem;
   cursor: pointer;
 } 
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0);}
+  50% { transform: translateY(-20px);}
+}
+@keyframes ping {
+  0% { transform: scale(1); opacity: 1;}
+  75%, 100% { transform: scale(1.5); opacity: 0;}
+}
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes floatImg {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.03); }
+}
+@keyframes flyin {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  70% { opacity: 1; transform: translateY(-60px) scale(1.2); }
+  100% { opacity: 0; transform: translateY(-100px) scale(0.8); }
+}
+@keyframes kisscam-pop {
+  0% { opacity: 0; transform: scale(0.7); }
+  60% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+@keyframes ceopopup {
+  0% { opacity: 0; transform: scale(0.7); }
+  60% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes memepopup {
+  0% { opacity: 0; transform: scale(0.7) translateY(40px); }
+  60% { opacity: 1; transform: scale(1.1) translateY(-10px); }
+  100% { opacity: 0; transform: scale(1) translateY(-40px); }
+}
+@keyframes screenRollDown {
+  0% { 
+    opacity: 0; 
+    transform: translateY(-100%);
+  }
+  50% { 
+    opacity: 1; 
+    transform: translateY(-50%);
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(0);
+  }
+}
+ 
