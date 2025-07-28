@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { bgMusic, correctSound, wrongSound, preloadAudio } from '../utils/audio';
 import { beepSound } from '../utils/audio'; // Adjust path if needed
+import { isMobile, getScreenDimensions } from '../utils/deviceDetection';
 
 const FLASH_DURATION = 5; // seconds
 const ZOOM = 1.2;
@@ -241,49 +242,81 @@ const SpotlightCanvas: React.FC<{
   onEndSession: () => void;
 }> = ({ timeLeft, totalTime, session, points, onWrongClick, showFinalWarning, onCorrectClick, ceoPos, setCeoPos, soundOn, setSoundOn, menuOpen, setMenuOpen, onEndSession }) => {
   const [spot, setSpot] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-  const [redFlash, setRedFlash] = useState(false);
   const [greenFlash, setGreenFlash] = useState(false);
-  const [ceoFrame, setCeoFrame] = useState(1); // 1-based index for frame
+  const [redFlash, setRedFlash] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState<{ x: number; y: number } | null>(null);
   const [animating, setAnimating] = useState(false);
-  const [flyIns, setFlyIns] = useState<{ id: number; x: number; y: number }[]>([]);
-  const flyInId = useRef(0);
+  const [ceoFrame, setCeoFrame] = useState(1); // 1-based index for frame
   const [kissCam, setKissCam] = useState(false);
   const [ceoPopup, setCeoPopup] = useState(false);
+  const [flyIns, setFlyIns] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const [memePopup, setMemePopup] = useState<{ img: string; text: string; x: number; y: number; id: number } | null>(null);
+  const flyInId = useRef(0);
+  const memeId = useRef(0);
+  const [screenDimensions, setScreenDimensions] = useState(getScreenDimensions());
+
   const MEMES = [
     { img: "/assets/meme1.png", text: "gotcha you fool!" },
     { img: "/assets/meme2.png", text: "Oh no, need espresso?" },
     { img: "/assets/meme3.png", text: "no Senorita, not here" },
     { img: "/assets/meme4.png", text: "You're a bad guyy ;)" }
   ];
-  const [memePopup, setMemePopup] = useState<null | { img: string; text: string; x: number; y: number; id: number }>(null);
-  const memeId = useRef(0);
-  // Remove TV screen state
-  // const [showTV, setShowTV] = useState(false);
-  // const [tvFrame, setTvFrame] = useState(1);
-  // Add new zoom state
-  const [zoomed, setZoomed] = useState(false);
-  const [zoomOrigin, setZoomOrigin] = useState<{ x: number; y: number } | null>(null);
 
+  // Update screen dimensions on resize
   useEffect(() => {
-    const handleMove = (e: MouseEvent | TouchEvent) => {
-      let x = window.innerWidth / 2;
-      let y = window.innerHeight / 2;
-      if ("touches" in e && e.touches.length > 0) {
-        x = e.touches[0].clientX;
-        y = e.touches[0].clientY;
-      } else if ("clientX" in e) {
-        x = e.clientX;
-        y = e.clientY;
-      }
-      setSpot({ x, y });
+    const handleResize = () => {
+      setScreenDimensions(getScreenDimensions());
     };
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("touchmove", handleMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("touchmove", handleMove);
-    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Handle both mouse and touch movement
+  const handleMove = (e: MouseEvent | TouchEvent) => {
+    if (animating || zoomed) return;
+    
+    let clientX: number, clientY: number;
+    
+    if (e instanceof MouseEvent) {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    } else {
+      // Touch event
+      const touch = e.touches[0];
+      clientX = touch.clientX;
+      clientY = touch.clientY;
+    }
+    
+    setSpot({ x: clientX, y: clientY });
+  };
+
+  // Handle both mouse and touch events
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => handleMove(e);
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault(); // Prevent scrolling on mobile
+      handleMove(e);
+    };
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault(); // Prevent scrolling on mobile
+    };
+
+    if (!isMobile()) {
+      // Desktop: mouse events
+      document.addEventListener('mousemove', handleMouseMove);
+    } else {
+      // Mobile: touch events
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchstart', handleTouchStart, { passive: false });
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchstart', handleTouchStart);
+    };
+  }, [animating, zoomed]);
 
   // Red flash effect
   useEffect(() => {
@@ -339,12 +372,24 @@ const SpotlightCanvas: React.FC<{
     return () => clearTimeout(t);
   }, [ceoPos.x, ceoPos.y]);
 
-  // Click handler
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  // Click handler for both mouse and touch
+  const handleClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (animating || zoomed) return; // Block input during animation
+    
+    let clientX: number, clientY: number;
     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    
+    if ('touches' in e) {
+      // Touch event
+      const touch = e.touches[0];
+      clientX = touch.clientX - rect.left;
+      clientY = touch.clientY - rect.top;
+    } else {
+      // Mouse event
+      clientX = e.clientX - rect.left;
+      clientY = e.clientY - rect.top;
+    }
+    
     // Adaptive scaling for hitbox
     const minScale = 0.4;
     const maxScale = 1.0;
@@ -355,12 +400,13 @@ const SpotlightCanvas: React.FC<{
       ((ceoPos.y - crowdTop) / (crowdBottom - crowdTop)) * (maxScale - minScale);
     const spriteWidth = 48 * scale;
     const spriteHeight = 64 * scale;
+    
     // Check if click is inside CEO/mistress sprite rectangle
     if (
-      x >= ceoPos.x &&
-      x <= ceoPos.x + spriteWidth &&
-      y >= ceoPos.y &&
-      y <= ceoPos.y + spriteHeight
+      clientX >= ceoPos.x &&
+      clientX <= ceoPos.x + spriteWidth &&
+      clientY >= ceoPos.y &&
+      clientY <= ceoPos.y + spriteHeight
     ) {
       setGreenFlash(true);
       setZoomOrigin({ x: ceoPos.x + spriteWidth / 2, y: ceoPos.y + spriteHeight / 2 });
@@ -381,7 +427,7 @@ const SpotlightCanvas: React.FC<{
       const memeIdx = Math.floor(Math.random() * MEMES.length);
       const meme = MEMES[memeIdx];
       const id = memeId.current++;
-      setMemePopup({ ...meme, x, y, id });
+      setMemePopup({ ...meme, x: clientX, y: clientY, id });
       setTimeout(() => {
         setMemePopup(current => (current && current.id === id ? null : current));
       }, 1000);
@@ -421,7 +467,11 @@ const SpotlightCanvas: React.FC<{
   const progress = (timeLeft / totalTime) * 100;
 
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', background: '#111' }} onClick={handleClick}>
+    <div 
+      style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', background: '#111' }} 
+      onClick={handleClick}
+      onTouchEnd={handleClick}
+    >
       {/* Main game zoom container */}
       <div style={{ width: '100vw', height: '100vh', ...zoomStyle, position: 'absolute', left: 0, top: 0 }}>
         {/* Main background (single image) */}
@@ -498,153 +548,130 @@ const SpotlightCanvas: React.FC<{
             }}
           />
         </div>
-        {/* Top timer bar */}
+        {/* Top UI Bar */}
         <div style={{
-          position: "absolute",
+          position: 'absolute',
           top: 0,
           left: 0,
-          width: "100%",
-          height: 18,
-          background: "#222",
-          zIndex: 10,
-          display: "flex",
-          alignItems: "center"
+          right: 0,
+          zIndex: 1000,
+          background: 'rgba(0,0,0,0.8)',
+          padding: screenDimensions.deviceType === 'mobile' ? '8px 12px' : '12px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backdropFilter: 'blur(4px)'
         }}>
+          {/* Session and Points */}
           <div style={{
-            height: "100%",
-            width: `${progress}%`,
-            background: timeLeft <= 5 ? "#ef4444" : "#facc15",
-            transition: "width 0.2s"
-          }} />
-          <span style={{
-            position: "absolute",
-            right: 16,
-            color: "#fff",
-            fontWeight: 700,
-            fontSize: 14,
-            letterSpacing: 1,
-            textShadow: "1px 1px 2px #000"
-          }}>TIME REMAINING</span>
-        </div>
-        {/* Session and points indicator */}
-        <div style={{
-          position: "absolute",
-          top: 28,
-          left: 16,
-          zIndex: 10,
-          background: "#a78bfa",
-          color: "#fff",
-          fontWeight: 700,
-          fontSize: 16,
-          borderRadius: 12,
-          padding: "4px 16px",
-          boxShadow: "0 2px 8px #0003"
-        }}># Session {session}</div>
-        {/* Points and menu section */}
-        <div style={{
-          position: "absolute",
-          top: 28,
-          right: 16,
-          zIndex: 10,
-          display: "flex",
-          alignItems: "center",
-          gap: 8
-        }}>
-          <div style={{
-            background: "#22c55e",
-            color: "#fff",
-            fontWeight: 700,
-            fontSize: 16,
-            borderRadius: 12,
-            padding: "4px 16px",
-            boxShadow: "0 2px 8px #0003"
-          }}>{points * 100} points</div>
-          
-          {/* Menu button */}
+            display: 'flex',
+            alignItems: 'center',
+            gap: screenDimensions.deviceType === 'mobile' ? 8 : 12
+          }}>
+            <div style={{
+              background: '#8b5cf6',
+              color: '#fff',
+              padding: screenDimensions.deviceType === 'mobile' ? '4px 8px' : '6px 12px',
+              borderRadius: screenDimensions.deviceType === 'mobile' ? 8 : 12,
+              fontWeight: 'bold',
+              fontSize: screenDimensions.deviceType === 'mobile' ? 12 : 14
+            }}>
+              #{session} Session {session}
+            </div>
+            <div style={{
+              background: '#22c55e',
+              color: '#fff',
+              padding: screenDimensions.deviceType === 'mobile' ? '4px 8px' : '6px 12px',
+              borderRadius: screenDimensions.deviceType === 'mobile' ? 8 : 12,
+              fontWeight: 'bold',
+              fontSize: screenDimensions.deviceType === 'mobile' ? 12 : 14
+            }}>
+              {points * 100} points
+            </div>
+          </div>
+
+          {/* Menu Button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             style={{
-              background: "#6366f1",
-              color: "#fff",
-              border: "none",
-              borderRadius: 12,
-              padding: "4px 8px",
-              fontSize: 16,
-              fontWeight: 700,
-              cursor: "pointer",
-              boxShadow: "0 2px 8px #0003",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 32,
-              height: 32
+              background: 'rgba(255,255,255,0.2)',
+              border: 'none',
+              color: '#fff',
+              padding: screenDimensions.deviceType === 'mobile' ? '8px' : '12px',
+              borderRadius: screenDimensions.deviceType === 'mobile' ? 6 : 8,
+              cursor: 'pointer',
+              fontSize: screenDimensions.deviceType === 'mobile' ? 16 : 18
             }}
           >
             ☰
           </button>
-          
-          {/* Menu dropdown */}
-          {menuOpen && (
-            <div style={{
-              position: "absolute",
-              top: 40,
-              right: 0,
-              background: "#1f2937",
-              color: "#fff",
-              borderRadius: 12,
-              padding: "8px 0",
-              boxShadow: "0 4px 16px #0007",
-              zIndex: 1000,
-              minWidth: 160
-            }}>
-              <button
-                onClick={() => {
-                  setSoundOn(!soundOn);
-                  setMenuOpen(false);
-                }}
-                style={{
-                  width: "100%",
-                  background: "transparent",
-                  color: "#fff",
-                  border: "none",
-                  padding: "8px 16px",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  textAlign: "left",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8
-                }}
-              >
-                {soundOn ? "🔊" : "🔇"} {soundOn ? "Sound On" : "Sound Off"}
-              </button>
-              <div style={{
-                height: 1,
-                background: "#374151",
-                margin: "4px 0"
-              }} />
-              <button
-                onClick={onEndSession}
-                style={{
-                  width: "100%",
-                  background: "transparent",
-                  color: "#ef4444",
-                  border: "none",
-                  padding: "8px 16px",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  textAlign: "left",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8
-                }}
-              >
-                🚪 End Session
-              </button>
-            </div>
-          )}
+        </div>
+
+        {/* Menu Dropdown */}
+        {menuOpen && (
+          <div style={{
+            position: 'absolute',
+            top: screenDimensions.deviceType === 'mobile' ? 60 : 80,
+            right: screenDimensions.deviceType === 'mobile' ? 12 : 20,
+            background: 'rgba(0,0,0,0.9)',
+            borderRadius: screenDimensions.deviceType === 'mobile' ? 8 : 12,
+            padding: screenDimensions.deviceType === 'mobile' ? 8 : 12,
+            zIndex: 1001,
+            backdropFilter: 'blur(4px)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            minWidth: screenDimensions.deviceType === 'mobile' ? 120 : 150
+          }}>
+            <button
+              onClick={() => setSoundOn(!soundOn)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#fff',
+                padding: screenDimensions.deviceType === 'mobile' ? '8px 12px' : '10px 16px',
+                cursor: 'pointer',
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                fontSize: screenDimensions.deviceType === 'mobile' ? 12 : 14
+              }}
+            >
+              {soundOn ? '🔊 Sound On' : '🔇 Sound Off'}
+            </button>
+            <button
+              onClick={onEndSession}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#ef4444',
+                padding: screenDimensions.deviceType === 'mobile' ? '8px 12px' : '10px 16px',
+                cursor: 'pointer',
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                fontSize: screenDimensions.deviceType === 'mobile' ? 12 : 14
+              }}
+            >
+              🏁 End Session
+            </button>
+          </div>
+        )}
+
+        {/* Timer Bar */}
+        <div style={{
+          position: 'absolute',
+          top: screenDimensions.deviceType === 'mobile' ? 60 : 80,
+          left: 0,
+          right: 0,
+          height: screenDimensions.deviceType === 'mobile' ? 4 : 6,
+          background: 'rgba(255,255,255,0.2)',
+          zIndex: 999
+        }}>
+          <div style={{
+            height: '100%',
+            width: `${progress}%`,
+            background: showFinalWarning ? '#ef4444' : '#22c55e',
+            transition: 'width 1s linear, background 0.3s ease'
+          }} />
         </div>
         {/* Final seconds warning */}
         {showFinalWarning && (

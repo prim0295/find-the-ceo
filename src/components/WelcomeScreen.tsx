@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getDeviceType, getScreenDimensions } from '../utils/deviceDetection';
 
 interface WelcomeScreenProps {
   onStart: () => void;
@@ -8,6 +9,16 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
   const [loadedImages, setLoadedImages] = useState(0);
+  const [screenDimensions, setScreenDimensions] = useState(getScreenDimensions());
+
+  // Update screen dimensions on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenDimensions(getScreenDimensions());
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Preload critical images
   useEffect(() => {
@@ -56,11 +67,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         justifyContent: "center",
         background: "linear-gradient(135deg, #ff7ce5 0%, #a78bfa 50%, #facc15 100%)",
         fontFamily: 'Comic Sans MS, Comic Sans, cursive',
-        padding: 32,
+        padding: screenDimensions.deviceType === 'mobile' ? 16 : 32,
         textAlign: "center"
       }}>
         <h1 style={{
-          fontSize: 48,
+          fontSize: screenDimensions.deviceType === 'mobile' ? 32 : 48,
           fontWeight: "900",
           color: "#fff",
           textShadow: "2px 2px 8px #000",
@@ -69,7 +80,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
           🎯 LOADING... 🎯
         </h1>
         <div style={{
-          width: 300,
+          width: screenDimensions.deviceType === 'mobile' ? 250 : 300,
           height: 20,
           background: "rgba(255,255,255,0.3)",
           borderRadius: 10,
@@ -77,18 +88,21 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
           marginBottom: 16
         }}>
           <div style={{
-            width: `${(loadedImages / 7) * 100}%`,
+            width: `${(loadedImages / 10) * 100}%`,
             height: "100%",
             background: "linear-gradient(90deg, #22c55e, #facc15)",
             transition: "width 0.3s ease"
           }} />
         </div>
-        <div style={{ color: "#fff", fontSize: 18 }}>
+        <div style={{ color: "#fff", fontSize: screenDimensions.deviceType === 'mobile' ? 14 : 18 }}>
           Loading assets... {loadedImages}/10
         </div>
       </div>
     );
   }
+
+  const isMobile = screenDimensions.deviceType === 'mobile';
+  const isTablet = screenDimensions.deviceType === 'tablet';
 
   return (
     <div style={{
@@ -97,170 +111,161 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      padding: 16,
+      background: "linear-gradient(135deg, #ff7ce5 0%, #a78bfa 50%, #facc15 100%)",
+      fontFamily: 'Comic Sans MS, Comic Sans, cursive',
+      padding: isMobile ? 16 : isTablet ? 24 : 32,
       textAlign: "center",
-      background: "linear-gradient(135deg, #ff7ce5 0%, #a78bfa 50%, #facc15 100%)"
+      overflow: "hidden"
     }}>
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        {/* Game Logo */}
-        <div>
-          <h1 style={{
-            fontSize: 64,
-            fontWeight: "900",
-            color: "#fff",
-            textShadow: "2px 2px 8px #000",
-            transform: "rotate(-2deg)",
-            margin: 0
-          }}>
-            WHERE'S THE
-          </h1>
-          <h1 style={{
-            fontSize: 64,
-            fontWeight: "900",
-            color: "#FFD600",
-            textShadow: "2px 2px 8px #000",
-            transform: "rotate(1deg)",
-            margin: 0
-          }}>
-            CEO?
-    </h1>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, color: "#fff", margin: "16px 0" }}>
-          <span role="img" aria-label="eye">👁️</span>
-          <span style={{ fontSize: 24, fontWeight: "bold" }}>Spot the executive love affair!</span>
-          <span role="img" aria-label="heart">💖</span>
-        </div>
-
-        {/* CEO Couple Image */}
-        <div style={{ position: "relative", display: "flex", justifyContent: "center", margin: "16px 0 24px 0" }}>
-          <div style={{
-            background: "linear-gradient(135deg, #ec4899, #a78bfa, #facc15)",
-            padding: 8,
-            borderRadius: 32,
-            transform: "rotate(1deg)",
-            animation: "float 3s ease-in-out infinite"
-          }}>
-            <div style={{ background: "#fff", padding: 16, borderRadius: 32 }}>
-    <img
-      src="/assets/ceo-mistress-frame2.png"
-                alt="CEO and Mistress - Your Targets!"
-                style={{ width: 320, borderRadius: 24, boxShadow: "0 0 40px #000", animation: "floatImg 4s ease-in-out infinite" }}
-              />
-            </div>
-          </div>
-          {/* Floating labels */}
-          <div style={{
-            position: "absolute", top: -16, left: -24, background: "#3b82f6", color: "#fff",
-            fontWeight: "900", padding: "8px 24px", borderRadius: 999, border: "4px solid #fff",
-            boxShadow: "0 4px 16px #000", transform: "rotate(-12deg)",
-            animation: "bounce 2s infinite"
-          }}>🤵 CEO</div>
-          <div style={{
-            position: "absolute", top: -16, right: -24, background: "#ec4899", color: "#fff",
-            fontWeight: "900", padding: "8px 24px", borderRadius: 999, border: "4px solid #fff",
-            boxShadow: "0 4px 16px #000", transform: "rotate(12deg)",
-            animation: "bounce 2s infinite", animationDelay: "1s"
-          }}>💃 MISTRESS</div>
-        </div>
-
-        {/* Call to action */}
+      <h1 style={{
+        fontSize: isMobile ? 36 : isTablet ? 42 : 56,
+        fontWeight: "900",
+        color: "#fff",
+        textShadow: "2px 2px 8px #000, 0 0 24px #ff0",
+        marginBottom: isMobile ? 12 : 16,
+        animation: "bounce 2s infinite"
+      }}>
+        WHERE'S THE CEO?
+      </h1>
+      <div style={{ 
+        fontSize: isMobile ? 16 : isTablet ? 18 : 24, 
+        color: "#fff", 
+        fontWeight: "900", 
+        marginBottom: isMobile ? 8 : 12 
+      }}>
+        👁️ Spot the executive love affair! 💖
+      </div>
+      <div style={{
+        display: "flex",
+        gap: isMobile ? 8 : 12,
+        marginBottom: isMobile ? 16 : 24,
+        flexWrap: "wrap",
+        justifyContent: "center"
+      }}>
         <div style={{
-          background: "rgba(239, 68, 68, 0.2)",
-          backdropFilter: "blur(4px)",
-          borderRadius: 32,
-          padding: 16,
-          border: "4px solid #f87171",
-          transform: "rotate(-1deg)",
-          margin: "24px 0"
+          background: "rgba(59, 130, 246, 0.9)",
+          border: "2px solid #fff",
+          borderRadius: isMobile ? 12 : 16,
+          padding: isMobile ? "8px 12px" : "12px 16px",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: isMobile ? 12 : 14,
+          display: "flex",
+          alignItems: "center",
+          gap: 6
         }}>
-          <p style={{
-            color: "#fff",
-            fontWeight: "900",
-            fontSize: 32,
-            animation: "pulse 2s infinite"
-          }}>
-            🎯 FIND THESE TWO IN THE CROWD! 🎯
-          </p>
+          <span style={{ fontSize: isMobile ? 14 : 16 }}>👔</span>
+          <span>CEO</span>
         </div>
-
-        {/* Meme Description */}
         <div style={{
-          background: "rgba(255,255,255,0.2)",
-          backdropFilter: "blur(4px)",
-          borderRadius: 32,
-          padding: 24,
-          border: "4px solid #FFD600",
-          transform: "rotate(1deg)",
-          margin: "24px 0"
+          background: "rgba(236, 72, 153, 0.9)",
+          border: "2px solid #fff",
+          borderRadius: isMobile ? 12 : 16,
+          padding: isMobile ? "8px 12px" : "12px 16px",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: isMobile ? 12 : 14,
+          display: "flex",
+          alignItems: "center",
+          gap: 6
         }}>
-          <p style={{
-            color: "#fff",
-            fontWeight: "bold",
-            fontSize: 20,
-            marginBottom: 16
-          }}>
-            Find the CEO and his Mistress as many times as possible to score maximum points!
-          </p>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 16,
-            color: "#FFD600",
-            fontWeight: "bold",
-            fontSize: 18
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span>🤵</span><span>Spot the CEO</span></div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span>💃</span><span>Find the Mistress</span></div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span>🔦</span><span>Move your spotlight</span></div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span>⏰</span><span>30 seconds only!</span></div>
-          </div>
-        </div>
-
-        {/* Controls */}
-        <div style={{ margin: "32px 0" }}>
-    <button
-      onClick={onStart}
-      style={{
-              background: "linear-gradient(90deg, #ec4899, #facc15)",
-        color: "#181818",
-              fontWeight: "900",
-              fontSize: 28,
-              padding: "20px 60px",
-              borderRadius: 999,
-              border: "4px solid #fff",
-              boxShadow: "0 4px 24px #000",
-              marginBottom: 16,
-              cursor: "pointer"
-      }}
-    >
-            🚀 START HUNTING! 🚀
-    </button>
-          <br />
-      <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
-        style={{
-              background: "rgba(255,255,255,0.2)",
-              color: "#fff",
-              fontWeight: "bold",
-          fontSize: 20,
-              padding: "12px 36px",
-              borderRadius: 999,
-              border: "2px solid #fff",
-              marginTop: 8,
-              cursor: "pointer"
-        }}
-      >
-            {soundEnabled ? "🔊 Sound ON" : "🔇 Sound OFF"}
-      </button>
-    </div>
-
-        {/* Easter Egg Text */}
-        <div style={{ color: "rgba(255,255,255,0.7)", fontWeight: "bold", fontSize: 14 }}>
-          Inspired by that viral Coldplay moment 🎵
+          <span style={{ fontSize: isMobile ? 14 : 16 }}>💃</span>
+          <span>MISTRESS</span>
         </div>
       </div>
-  </div>
-);
+      <div style={{
+        background: "rgba(236, 72, 153, 0.9)",
+        border: "3px solid #dc2626",
+        borderRadius: isMobile ? 16 : 20,
+        padding: isMobile ? 16 : 20,
+        marginBottom: isMobile ? 16 : 24,
+        maxWidth: isMobile ? "90%" : "600px"
+      }}>
+        <div style={{
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: isMobile ? 16 : 20,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8
+        }}>
+          🎯 FIND THESE TWO IN THE CROWD! 🎯
+        </div>
+      </div>
+      <div style={{
+        background: "rgba(253, 224, 71, 0.9)",
+        border: "3px solid #f59e0b",
+        borderRadius: isMobile ? 16 : 20,
+        padding: isMobile ? 16 : 20,
+        marginBottom: isMobile ? 24 : 32,
+        maxWidth: isMobile ? "90%" : "600px"
+      }}>
+        <div style={{
+          color: "#18181b",
+          fontWeight: "bold",
+          fontSize: isMobile ? 14 : 16,
+          marginBottom: isMobile ? 12 : 16
+        }}>
+          Find the CEO and his Mistress as many times as possible to score maximum points!
+        </div>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+          gap: isMobile ? 8 : 16,
+          color: "#18181b",
+          fontWeight: "bold",
+          fontSize: isMobile ? 12 : 14
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: isMobile ? 16 : 18 }}>👔</span>
+            <span>Spot the CEO</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: isMobile ? 16 : 18 }}>💃</span>
+            <span>Find the Mistress</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: isMobile ? 16 : 18 }}>🔦</span>
+            <span>{isMobile ? "Tap to move spotlight" : "Move your spotlight"}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: isMobile ? 16 : 18 }}>⏰</span>
+            <span>30 seconds only!</span>
+          </div>
+        </div>
+      </div>
+      <button
+        onClick={onStart}
+        style={{
+          background: "linear-gradient(135deg, #facc15 0%, #f59e0b 100%)",
+          border: "3px solid #fff",
+          borderRadius: isMobile ? 16 : 20,
+          padding: isMobile ? "16px 32px" : "20px 40px",
+          color: "#18181b",
+          fontWeight: "bold",
+          fontSize: isMobile ? 18 : 24,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+          animation: "bounce 2s infinite",
+          transition: "transform 0.2s ease"
+        }}
+        onMouseEnter={(e) => {
+          (e.target as HTMLElement).style.transform = "scale(1.05)";
+        }}
+        onMouseLeave={(e) => {
+          (e.target as HTMLElement).style.transform = "scale(1)";
+        }}
+      >
+        <span style={{ fontSize: isMobile ? 20 : 24 }}>🚀</span>
+        START HUNTING!
+        <span style={{ fontSize: isMobile ? 20 : 24 }}>🚀</span>
+      </button>
+    </div>
+  );
 };
 
 export default WelcomeScreen;
