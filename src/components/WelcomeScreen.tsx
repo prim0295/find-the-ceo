@@ -235,6 +235,26 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
           </div>
         </div>
       </div>
+      
+      {/* CEO/Mistress Image */}
+      <div style={{
+        marginBottom: isMobile ? 24 : 32,
+        textAlign: "center"
+      }}>
+        <img
+          src="/assets/ceo-mistress-frame2.png"
+          alt="CEO and Mistress"
+          style={{
+            width: isMobile ? 200 : isTablet ? 250 : 300,
+            height: "auto",
+            borderRadius: isMobile ? 16 : 20,
+            border: "3px solid #fff",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+            animation: "float 3s ease-in-out infinite"
+          }}
+        />
+      </div>
+      
       <button
         onClick={onStart}
         style={{

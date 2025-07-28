@@ -555,12 +555,13 @@ const SpotlightCanvas: React.FC<{
           left: 0,
           right: 0,
           zIndex: 1000,
-          background: 'rgba(0,0,0,0.8)',
+          background: 'linear-gradient(135deg, rgba(255,124,229,0.9) 0%, rgba(167,139,250,0.9) 50%, rgba(250,204,21,0.9) 100%)',
           padding: screenDimensions.deviceType === 'mobile' ? '8px 12px' : '12px 20px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          backdropFilter: 'blur(4px)'
+          backdropFilter: 'blur(4px)',
+          borderBottom: '2px solid rgba(255,255,255,0.3)'
         }}>
           {/* Session and Points */}
           <div style={{

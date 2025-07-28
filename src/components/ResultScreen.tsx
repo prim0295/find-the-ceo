@@ -427,6 +427,24 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
           </div>
         )}
 
+        {/* Meme Image */}
+        <div style={{
+          marginBottom: isMobile ? 24 : 32,
+          textAlign: "center"
+        }}>
+          <img
+            src="/assets/meme1.png"
+            alt="Meme Reaction"
+            style={{
+              width: isMobile ? 120 : isTablet ? 150 : 180,
+              height: "auto",
+              borderRadius: isMobile ? 12 : 16,
+              border: "2px solid #fff",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.3)"
+            }}
+          />
+        </div>
+
         {/* Action Buttons */}
         <div style={{
           display: "flex",
