@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { bgMusic, correctSound, wrongSound } from '../utils/audio';
+import { bgMusic, correctSound, wrongSound, preloadAudio } from '../utils/audio';
 import { beepSound } from '../utils/audio'; // Adjust path if needed
 
 const FLASH_DURATION = 5; // seconds
@@ -779,6 +779,11 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ceoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Preload audio when game starts
+  useEffect(() => {
+    preloadAudio();
+  }, []);
 
   // Play/stop background music
   useEffect(() => {

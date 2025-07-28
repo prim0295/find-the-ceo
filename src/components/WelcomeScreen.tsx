@@ -1,7 +1,83 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const WelcomeScreen = ({ onStart }: { onStart: () => void }) => {
+interface WelcomeScreenProps {
+  onStart: () => void;
+}
+
+const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [loadedImages, setLoadedImages] = useState(0);
+
+  // Preload critical images
+  useEffect(() => {
+    const preloadImages = [
+      '/assets/ceo-mistress-frame1.png',
+      '/assets/ceo-mistress-frame2.png',
+      '/assets/ceo-mistress-frame3.png',
+      '/assets/ceo-mistress-frame4.png',
+      '/crowd-images/crowd3.png',
+      '/crowd-images/crowd3_bg.png',
+      '/crowd-images/crowd3_fg.png'
+    ];
+
+    let loaded = 0;
+    preloadImages.forEach(src => {
+      const img = new Image();
+      img.onload = () => {
+        loaded++;
+        setLoadedImages(loaded);
+        if (loaded === preloadImages.length) {
+          setLoading(false);
+        }
+      };
+      img.src = src;
+    });
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #ff7ce5 0%, #a78bfa 50%, #facc15 100%)",
+        fontFamily: 'Comic Sans MS, Comic Sans, cursive',
+        padding: 32,
+        textAlign: "center"
+      }}>
+        <h1 style={{
+          fontSize: 48,
+          fontWeight: "900",
+          color: "#fff",
+          textShadow: "2px 2px 8px #000",
+          marginBottom: 32
+        }}>
+          🎯 LOADING... 🎯
+        </h1>
+        <div style={{
+          width: 300,
+          height: 20,
+          background: "rgba(255,255,255,0.3)",
+          borderRadius: 10,
+          overflow: "hidden",
+          marginBottom: 16
+        }}>
+          <div style={{
+            width: `${(loadedImages / 7) * 100}%`,
+            height: "100%",
+            background: "linear-gradient(90deg, #22c55e, #facc15)",
+            transition: "width 0.3s ease"
+          }} />
+        </div>
+        <div style={{ color: "#fff", fontSize: 18 }}>
+          Loading assets... {loadedImages}/7
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
