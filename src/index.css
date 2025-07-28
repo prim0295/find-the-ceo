@@ -11,6 +11,7 @@ body {
   touch-action: none; /* Prevent zoom/scroll on mobile */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 16px; /* Base font size */
 }
 
 /* Responsive container */
@@ -23,9 +24,10 @@ body {
 /* Mobile-specific fixes */
 @media (max-width: 768px) {
   body {
-    font-size: 14px;
+    font-size: 16px; /* Keep consistent font size */
     overflow: auto; /* Allow scrolling on mobile */
     touch-action: manipulation; /* Better touch handling */
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', cursive; /* Ensure same font */
   }
   
   #root {
@@ -44,12 +46,17 @@ body {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
   }
+  
+  /* Better mobile spacing */
+  * {
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', cursive;
+  }
 }
 
 /* Tablet styles */
 @media (min-width: 769px) and (max-width: 1024px) {
   body {
-    font-size: 16px;
+    font-size: 18px;
   }
 }
 

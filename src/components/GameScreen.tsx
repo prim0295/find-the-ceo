@@ -295,21 +295,17 @@ const SpotlightCanvas: React.FC<{
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => handleMove(e);
     const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault(); // Prevent scrolling on mobile
+      e.preventDefault(); // Prevent scrolling
       handleMove(e);
     };
     const handleTouchStart = (e: TouchEvent) => {
-      e.preventDefault(); // Prevent scrolling on mobile
+      e.preventDefault(); // Prevent scrolling
     };
 
-    if (!isMobile()) {
-      // Desktop: mouse events
-      document.addEventListener('mousemove', handleMouseMove);
-    } else {
-      // Mobile: touch events
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      document.addEventListener('touchstart', handleTouchStart, { passive: false });
-    }
+    // Add event listeners
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchstart', handleTouchStart, { passive: false });
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
@@ -390,39 +386,36 @@ const SpotlightCanvas: React.FC<{
       clientY = e.clientY - rect.top;
     }
     
-    // Adaptive scaling for hitbox
-    const minScale = 0.4;
-    const maxScale = 1.0;
-    const crowdTop = 0;
-    const crowdBottom = window.innerHeight;
-    const scale =
-      minScale +
-      ((ceoPos.y - crowdTop) / (crowdBottom - crowdTop)) * (maxScale - minScale);
-    const spriteWidth = 48 * scale;
-    const spriteHeight = 64 * scale;
+    // Move spotlight to click position
+    setSpot({ x: clientX, y: clientY });
     
-    // Check if click is inside CEO/mistress sprite rectangle
-    if (
-      clientX >= ceoPos.x &&
-      clientX <= ceoPos.x + spriteWidth &&
-      clientY >= ceoPos.y &&
-      clientY <= ceoPos.y + spriteHeight
-    ) {
+    // Calculate hit detection with simpler logic
+    const hitRadius = 60; // Larger hit area for better mobile experience
+    const distance = Math.sqrt(
+      Math.pow(clientX - ceoPos.x, 2) + Math.pow(clientY - ceoPos.y, 2)
+    );
+    
+    if (distance <= hitRadius) {
+      // Correct click - CEO/mistress found
       setGreenFlash(true);
-      setZoomOrigin({ x: ceoPos.x + spriteWidth / 2, y: ceoPos.y + spriteHeight / 2 });
+      setZoomOrigin({ x: ceoPos.x, y: ceoPos.y });
       setZoomed(true);
       setCeoFrame(1); // Ensure animation always starts at frame 1
       setAnimating(true);
+      
       // Add fly-in animation
       const id = flyInId.current++;
       setFlyIns(flyIns => [...flyIns, { id, x: ceoPos.x, y: ceoPos.y }]);
       setTimeout(() => {
         setFlyIns(flyIns => flyIns.filter(f => f.id !== id));
       }, 1000);
+      
       onCorrectClick();
     } else {
+      // Wrong click
       setRedFlash(true);
       onWrongClick();
+      
       // Meme popup logic
       const memeIdx = Math.floor(Math.random() * MEMES.length);
       const meme = MEMES[memeIdx];

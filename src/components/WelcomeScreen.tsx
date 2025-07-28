@@ -120,24 +120,24 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: isMobile ? "16px 12px" : isTablet ? "30px 24px" : "40px 32px",
+        padding: isMobile ? "24px 20px 16px" : isTablet ? "30px 24px" : "40px 32px",
         textAlign: "center"
       }}>
         <h1 style={{
-          fontSize: isMobile ? 24 : isTablet ? 36 : 48,
+          fontSize: isMobile ? 28 : isTablet ? 36 : 48,
           fontWeight: "900",
           color: "#fff",
           textShadow: "2px 2px 8px #000, 0 0 24px #ff0",
-          marginBottom: isMobile ? 6 : 12,
+          marginBottom: isMobile ? 8 : 12,
           animation: "bounce 2s infinite"
         }}>
           WHERE'S THE CEO?
         </h1>
         <div style={{ 
-          fontSize: isMobile ? 12 : isTablet ? 16 : 20, 
+          fontSize: isMobile ? 14 : isTablet ? 16 : 20, 
           color: "#fff", 
           fontWeight: "900", 
-          marginBottom: isMobile ? 6 : 12 
+          marginBottom: isMobile ? 12 : 12 
         }}>
           👁️ Spot the executive love affair! 💖
         </div>
@@ -145,110 +145,95 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
 
       {/* Main Content Section */}
       <div style={{
-        flex: isMobile ? "1" : "1",
+        flex: "1",
         display: "flex",
-        flexDirection: isMobile ? "column" : "row",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: isMobile ? 12 : 24,
-        padding: isMobile ? "12px" : isTablet ? "24px" : "32px",
+        gap: isMobile ? 20 : 24,
+        padding: isMobile ? "0 20px" : isTablet ? "24px" : "32px",
         minHeight: isMobile ? "auto" : "50vh"
       }}>
-        {/* Left Side - Image and Labels */}
+        {/* Character Labels */}
         <div style={{
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: isMobile ? 8 : 16,
-          flex: isMobile ? "0 0 auto" : "0 0 40%"
+          gap: isMobile ? 12 : 12,
+          flexWrap: "wrap",
+          justifyContent: "center",
+          marginBottom: isMobile ? 16 : 16
         }}>
-          {/* CEO/Mistress Image */}
           <div style={{
-            textAlign: "center",
-            marginBottom: isMobile ? 6 : 12
-          }}>
-            <img
-              src="/assets/ceo-mistress-frame2.png"
-              alt="CEO and Mistress"
-              style={{
-                width: isMobile ? 80 : isTablet ? 160 : 200,
-                height: "auto",
-                borderRadius: isMobile ? 8 : 16,
-                border: "2px solid #fff",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
-                animation: "float 3s ease-in-out infinite"
-              }}
-            />
-          </div>
-
-          {/* Character Labels */}
-          <div style={{
+            background: "rgba(59, 130, 246, 0.9)",
+            border: "2px solid #fff",
+            borderRadius: isMobile ? 12 : 12,
+            padding: isMobile ? "8px 16px" : "8px 12px",
+            color: "#fff",
+            fontWeight: "bold",
+            fontSize: isMobile ? 12 : 12,
             display: "flex",
-            gap: isMobile ? 6 : 12,
-            flexWrap: "wrap",
-            justifyContent: "center"
+            alignItems: "center",
+            gap: 6
           }}>
-            <div style={{
-              background: "rgba(59, 130, 246, 0.9)",
-              border: "2px solid #fff",
-              borderRadius: isMobile ? 6 : 12,
-              padding: isMobile ? "4px 8px" : "8px 12px",
-              color: "#fff",
-              fontWeight: "bold",
-              fontSize: isMobile ? 8 : 12,
-              display: "flex",
-              alignItems: "center",
-              gap: 3
-            }}>
-              <span style={{ fontSize: isMobile ? 10 : 14 }}>👔</span>
-              <span>CEO</span>
-            </div>
-            <div style={{
-              background: "rgba(236, 72, 153, 0.9)",
-              border: "2px solid #fff",
-              borderRadius: isMobile ? 6 : 12,
-              padding: isMobile ? "4px 8px" : "8px 12px",
-              color: "#fff",
-              fontWeight: "bold",
-              fontSize: isMobile ? 8 : 12,
-              display: "flex",
-              alignItems: "center",
-              gap: 3
-            }}>
-              <span style={{ fontSize: isMobile ? 10 : 14 }}>💃</span>
-              <span>MISTRESS</span>
-            </div>
+            <span style={{ fontSize: isMobile ? 14 : 14 }}>👔</span>
+            <span>CEO</span>
+          </div>
+          <div style={{
+            background: "rgba(236, 72, 153, 0.9)",
+            border: "2px solid #fff",
+            borderRadius: isMobile ? 12 : 12,
+            padding: isMobile ? "8px 16px" : "8px 12px",
+            color: "#fff",
+            fontWeight: "bold",
+            fontSize: isMobile ? 12 : 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 6
+          }}>
+            <span style={{ fontSize: isMobile ? 14 : 14 }}>💃</span>
+            <span>MISTRESS</span>
           </div>
         </div>
 
-        {/* Right Side - Instructions */}
+        {/* Primary Instruction */}
         <div style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: isMobile ? 8 : 16,
-          flex: isMobile ? "0 0 auto" : "0 0 60%"
+          background: "rgba(236, 72, 153, 0.9)",
+          border: "3px solid #dc2626",
+          borderRadius: isMobile ? 16 : 16,
+          padding: isMobile ? "16px 20px" : "16px 20px",
+          maxWidth: isMobile ? "100%" : "400px",
+          marginBottom: isMobile ? 20 : 20
         }}>
-          {/* Primary Instruction */}
           <div style={{
-            background: "rgba(236, 72, 153, 0.9)",
-            border: "2px solid #dc2626",
-            borderRadius: isMobile ? 8 : 16,
-            padding: isMobile ? "8px 12px" : "16px 20px",
-            maxWidth: isMobile ? "100%" : "400px"
+            color: "#fff",
+            fontWeight: "bold",
+            fontSize: isMobile ? 16 : 18,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            textAlign: "center"
           }}>
-            <div style={{
-              color: "#fff",
-              fontWeight: "bold",
-              fontSize: isMobile ? 11 : 18,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 4,
-              textAlign: "center"
-            }}>
-              🎯 FIND THESE TWO IN THE CROWD! 🎯
-            </div>
+            🎯 FIND THESE TWO IN THE CROWD! 🎯
           </div>
+        </div>
+
+        {/* CEO/Mistress Image - Centered */}
+        <div style={{
+          textAlign: "center",
+          marginBottom: isMobile ? 20 : 20
+        }}>
+          <img
+            src="/assets/ceo-mistress-frame2.png"
+            alt="CEO and Mistress"
+            style={{
+              width: isMobile ? 140 : isTablet ? 160 : 200,
+              height: "auto",
+              borderRadius: isMobile ? 16 : 16,
+              border: "3px solid #fff",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+              animation: "float 3s ease-in-out infinite"
+            }}
+          />
         </div>
       </div>
 
@@ -258,23 +243,23 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: isMobile ? "12px" : isTablet ? "24px" : "32px"
+        padding: isMobile ? "20px" : isTablet ? "24px" : "32px"
       }}>
         <button
           onClick={onStart}
           style={{
             background: "linear-gradient(135deg, #facc15 0%, #f59e0b 100%)",
-            border: "2px solid #fff",
-            borderRadius: isMobile ? 10 : 16,
-            padding: isMobile ? "10px 20px" : isTablet ? "16px 32px" : "20px 40px",
+            border: "3px solid #fff",
+            borderRadius: isMobile ? 16 : 16,
+            padding: isMobile ? "16px 32px" : isTablet ? "16px 32px" : "20px 40px",
             color: "#18181b",
             fontWeight: "bold",
-            fontSize: isMobile ? 14 : isTablet ? 20 : 24,
+            fontSize: isMobile ? 18 : isTablet ? 20 : 24,
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
-            gap: 4,
-            boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+            gap: 8,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
             animation: "bounce 2s infinite",
             transition: "transform 0.2s ease"
           }}
@@ -285,9 +270,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
             (e.target as HTMLElement).style.transform = "scale(1)";
           }}
         >
-          <span style={{ fontSize: isMobile ? 16 : 22 }}>🚀</span>
+          <span style={{ fontSize: isMobile ? 20 : 22 }}>🚀</span>
           START HUNTING!
-          <span style={{ fontSize: isMobile ? 16 : 22 }}>🚀</span>
+          <span style={{ fontSize: isMobile ? 20 : 22 }}>🚀</span>
         </button>
       </div>
     </div>
