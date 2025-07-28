@@ -22,6 +22,7 @@ const FlashScreen = ({ onDone }: { onDone: () => void }) => {
     const timer = setInterval(() => {
       current--;
       setCountdown(current);
+      // Only play beep if countdown is still going
       if (current > 0) {
         beepSound.play();
       }
@@ -313,11 +314,14 @@ const SpotlightCanvas: React.FC<{
         setAnimating(false);
         setCeoFrame(1);
         setZoomed(false);
-        setCeoPos(getRandomPosition());
+        // Move CEO to new position after animation completes
+        setTimeout(() => {
+          setCeoPos(getRandomPosition());
+        }, 100);
       }, 1600 + 500)); // End at 2100ms
       return () => timeouts.forEach(clearTimeout);
     }
-  }, [animating, zoomed, setCeoPos]);
+  }, [animating, zoomed]); // Removed setCeoPos dependency
 
   // Show kiss-cam overlay on correct click
   useEffect(() => {
