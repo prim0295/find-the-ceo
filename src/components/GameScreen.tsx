@@ -116,6 +116,40 @@ const FlashScreen = ({ onDone }: { onDone: () => void }) => {
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span>🔦</span><span>Move your spotlight</span></div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span>⏰</span><span>30 seconds only!</span></div>
             </div>
+            
+            {/* Mobile-specific instructions */}
+            {isMobile() && (
+              <div style={{
+                background: "rgba(255,255,255,0.1)",
+                borderRadius: 16,
+                padding: 16,
+                marginTop: 16,
+                border: "2px solid #FFD600"
+              }}>
+                <p style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  color: "#FFD600",
+                  marginBottom: 8
+                }}>
+                  📱 Mobile Controls:
+                </p>
+                <div style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                  fontSize: 14,
+                  color: "#fff"
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>👆</span><span>Single tap to move spotlight</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>👆👆</span><span>Double tap to shoot at CEO/Mistress</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -255,6 +289,8 @@ const SpotlightCanvas: React.FC<{
   const flyInId = useRef(0);
   const memeId = useRef(0);
   const [screenDimensions, setScreenDimensions] = useState(getScreenDimensions());
+  const [lastTap, setLastTap] = useState(0);
+  const [tapCount, setTapCount] = useState(0);
 
   const MEMES = [
     { img: "/assets/meme1.png", text: "gotcha you fool!" },
@@ -376,16 +412,38 @@ const SpotlightCanvas: React.FC<{
     const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
     
     if ('touches' in e) {
-      // Touch event
+      // Touch event - implement double tap logic
       const touch = e.touches[0];
       clientX = touch.clientX - rect.left;
       clientY = touch.clientY - rect.top;
+      
+      const now = Date.now();
+      const DOUBLE_TAP_DELAY = 300; // 300ms for double tap
+      
+      if (now - lastTap < DOUBLE_TAP_DELAY) {
+        // Double tap detected
+        setTapCount(prev => prev + 1);
+        if (tapCount >= 1) {
+          // Execute the action on double tap
+          executeGameAction(clientX, clientY);
+          setTapCount(0);
+        }
+      } else {
+        // Single tap - just move spotlight
+        setSpot({ x: clientX, y: clientY });
+        setTapCount(1);
+      }
+      setLastTap(now);
     } else {
-      // Mouse event
+      // Mouse event - direct click
       clientX = e.clientX - rect.left;
       clientY = e.clientY - rect.top;
+      executeGameAction(clientX, clientY);
     }
-    
+  };
+
+  // Execute the actual game action (hit detection)
+  const executeGameAction = (clientX: number, clientY: number) => {
     // Move spotlight to click position
     setSpot({ x: clientX, y: clientY });
     
@@ -460,336 +518,375 @@ const SpotlightCanvas: React.FC<{
   const progress = (timeLeft / totalTime) * 100;
 
   return (
-    <div 
-      style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', background: '#111' }} 
-      onClick={handleClick}
-      onTouchEnd={handleClick}
-    >
-      {/* Main game zoom container */}
-      <div style={{ width: '100vw', height: '100vh', ...zoomStyle, position: 'absolute', left: 0, top: 0 }}>
-        {/* Main background (single image) */}
-        <img
-          src='/crowd-images/crowd3.png'
-          style={{
-            width: '100vw',
-            height: '100vh',
-            objectFit: 'cover',
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            zIndex: 1
-          }}
-        />
-        {/* CEO/mistress as sprite overlay (adaptive scaling as before) */}
-        {(() => {
-          const minScale = 0.4;
-          const maxScale = 1.0;
-          const crowdTop = 0;
-          const crowdBottom = window.innerHeight;
-          const scale =
-            minScale +
-            ((ceoPos.y - crowdTop) / (crowdBottom - crowdTop)) * (maxScale - minScale);
-          let spriteWidth = 48 * scale;
-          let spriteHeight = 64 * scale;
-          // If zoomed in, increase sprite size to fit kiss-cam
-          if (zoomed) {
-            spriteWidth *= 1.8; // or your chosen multiplier
-            spriteHeight *= 1.8;
-          }
-          return (
-            <img
-              src={CEO_FRAMES[ceoFrame - 1]}
-              alt="CEO and Mistress"
-              style={{
-                position: "absolute",
-                left: ceoPos.x - (zoomed ? (spriteWidth - 48 * scale) / 2 : 0),
-                top: ceoPos.y - (zoomed ? (spriteHeight - 64 * scale) / 2 : 0),
-                width: spriteWidth,
-                height: spriteHeight,
-                imageRendering: "pixelated",
-                zIndex: 2,
-                pointerEvents: "none",
-                animation: ceoPopup ? "ceopopup 0.4s cubic-bezier(.23,1.02,.64,.99)" : undefined
-              }}
-            />
-          );
-        })()}
-        {/* Spotlight zoomed-in area */}
-        <div
-          style={{
-            position: 'absolute',
-            left: spot.x - SPOTLIGHT_RADIUS,
-            top: spot.y - SPOTLIGHT_RADIUS,
-            width: SPOTLIGHT_RADIUS * 2,
-            height: SPOTLIGHT_RADIUS * 2,
-            borderRadius: '50%',
-            overflow: 'hidden',
-            zIndex: 3,
-            pointerEvents: 'none',
-            boxShadow: '0 0 32px 8px #fff8'
-          }}
-        >
+    <div style={{
+      width: "100vw",
+      height: "100vh",
+      position: "relative",
+      overflow: "hidden",
+      background: "linear-gradient(135deg, #ff7ce5 0%, #a78bfa 50%, #facc15 100%)",
+      fontFamily: 'Comic Sans MS, Comic Sans, Chalkboard SE, Comic Neue, Arial Rounded MT Bold, Helvetica Rounded, cursive'
+    }}>
+      {/* Top UI Bar */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        background: "linear-gradient(135deg, rgba(255,124,229,0.9) 0%, rgba(167,139,250,0.9) 50%, rgba(250,204,21,0.9) 100%)",
+        borderBottom: "3px solid #fff",
+        padding: isMobile ? "8px 12px" : "12px 20px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        zIndex: 1000,
+        backdropFilter: "blur(10px)"
+      }}>
+        {/* Timer */}
+        <div style={{
+          background: "rgba(0,0,0,0.8)",
+          color: "#fff",
+          padding: isMobile ? "6px 12px" : "8px 16px",
+          borderRadius: isMobile ? 12 : 16,
+          fontWeight: "bold",
+          fontSize: isMobile ? 14 : 16,
+          border: "2px solid #fff",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+        }}>
+          ⏰ {timeLeft}s
+        </div>
+
+        {/* Session and Points */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: isMobile ? 8 : 12
+        }}>
+          <div style={{
+            background: "rgba(59, 130, 246, 0.9)",
+            color: "#fff",
+            padding: isMobile ? "6px 10px" : "8px 12px",
+            borderRadius: isMobile ? 10 : 12,
+            fontWeight: "bold",
+            fontSize: isMobile ? 12 : 14,
+            border: "2px solid #fff"
+          }}>
+            Session {session}
+          </div>
+          <div style={{
+            background: "rgba(34, 197, 94, 0.9)",
+            color: "#fff",
+            padding: isMobile ? "6px 10px" : "8px 12px",
+            borderRadius: isMobile ? 10 : 12,
+            fontWeight: "bold",
+            fontSize: isMobile ? 12 : 14,
+            border: "2px solid #fff"
+          }}>
+            {points} pts
+          </div>
+        </div>
+
+        {/* Menu Button */}
+        <div style={{ position: "relative" }}>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{
+              background: "rgba(0,0,0,0.8)",
+              border: "2px solid #fff",
+              borderRadius: isMobile ? 10 : 12,
+              color: "#fff",
+              padding: isMobile ? "6px 8px" : "8px 10px",
+              cursor: "pointer",
+              fontSize: isMobile ? 16 : 18,
+              fontWeight: "bold"
+            }}
+          >
+            ☰
+          </button>
+          
+          {menuOpen && (
+            <div style={{
+              position: "absolute",
+              top: "100%",
+              right: 0,
+              background: "rgba(0,0,0,0.95)",
+              border: "2px solid #fff",
+              borderRadius: isMobile ? 10 : 12,
+              padding: isMobile ? "8px" : "12px",
+              marginTop: 4,
+              zIndex: 1001,
+              minWidth: isMobile ? 120 : 150
+            }}>
+              <button
+                onClick={() => {
+                  setSoundOn(!soundOn);
+                  setMenuOpen(false);
+                }}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#fff",
+                  padding: isMobile ? "6px 8px" : "8px 10px",
+                  cursor: "pointer",
+                  fontSize: isMobile ? 12 : 14,
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left"
+                }}
+              >
+                {soundOn ? "🔊 Sound On" : "🔇 Sound Off"}
+              </button>
+              <button
+                onClick={() => {
+                  onEndSession();
+                  setMenuOpen(false);
+                }}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#fff",
+                  padding: isMobile ? "6px 8px" : "8px 10px",
+                  cursor: "pointer",
+                  fontSize: isMobile ? 12 : 14,
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left"
+                }}
+              >
+                🏁 End Session
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Main Game Area */}
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "relative",
+          cursor: "crosshair"
+        }}
+        onClick={handleClick}
+        onTouchEnd={handleClick}
+      >
+        {/* Main game zoom container */}
+        <div style={{ width: '100vw', height: '100vh', ...zoomStyle, position: 'absolute', left: 0, top: 0 }}>
+          {/* Main background (single image) */}
           <img
-            src='/crowd-images/crowd_zoomedin1.png'
+            src='/crowd-images/crowd3.png'
             style={{
               width: '100vw',
               height: '100vh',
               objectFit: 'cover',
               position: 'absolute',
-              left: -spot.x + SPOTLIGHT_RADIUS,
-              top: -spot.y + SPOTLIGHT_RADIUS
+              left: 0,
+              top: 0,
+              zIndex: 1
             }}
           />
-        </div>
-        {/* Top UI Bar */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          background: 'linear-gradient(135deg, rgba(255,124,229,0.9) 0%, rgba(167,139,250,0.9) 50%, rgba(250,204,21,0.9) 100%)',
-          padding: screenDimensions.deviceType === 'mobile' ? '8px 12px' : '12px 20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backdropFilter: 'blur(4px)',
-          borderBottom: '2px solid rgba(255,255,255,0.3)'
-        }}>
-          {/* Session and Points */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: screenDimensions.deviceType === 'mobile' ? 8 : 12
-          }}>
-            <div style={{
-              background: '#8b5cf6',
-              color: '#fff',
-              padding: screenDimensions.deviceType === 'mobile' ? '4px 8px' : '6px 12px',
-              borderRadius: screenDimensions.deviceType === 'mobile' ? 8 : 12,
-              fontWeight: 'bold',
-              fontSize: screenDimensions.deviceType === 'mobile' ? 12 : 14
-            }}>
-              #{session} Session {session}
-            </div>
-            <div style={{
-              background: '#22c55e',
-              color: '#fff',
-              padding: screenDimensions.deviceType === 'mobile' ? '4px 8px' : '6px 12px',
-              borderRadius: screenDimensions.deviceType === 'mobile' ? 8 : 12,
-              fontWeight: 'bold',
-              fontSize: screenDimensions.deviceType === 'mobile' ? 12 : 14
-            }}>
-              {points * 100} points
-            </div>
-          </div>
-
-          {/* Menu Button */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              border: 'none',
-              color: '#fff',
-              padding: screenDimensions.deviceType === 'mobile' ? '8px' : '12px',
-              borderRadius: screenDimensions.deviceType === 'mobile' ? 6 : 8,
-              cursor: 'pointer',
-              fontSize: screenDimensions.deviceType === 'mobile' ? 16 : 18
-            }}
-          >
-            ☰
-          </button>
-        </div>
-
-        {/* Menu Dropdown */}
-        {menuOpen && (
-          <div style={{
-            position: 'absolute',
-            top: screenDimensions.deviceType === 'mobile' ? 60 : 80,
-            right: screenDimensions.deviceType === 'mobile' ? 12 : 20,
-            background: 'rgba(0,0,0,0.9)',
-            borderRadius: screenDimensions.deviceType === 'mobile' ? 8 : 12,
-            padding: screenDimensions.deviceType === 'mobile' ? 8 : 12,
-            zIndex: 1001,
-            backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            minWidth: screenDimensions.deviceType === 'mobile' ? 120 : 150
-          }}>
-            <button
-              onClick={() => setSoundOn(!soundOn)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#fff',
-                padding: screenDimensions.deviceType === 'mobile' ? '8px 12px' : '10px 16px',
-                cursor: 'pointer',
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                fontSize: screenDimensions.deviceType === 'mobile' ? 12 : 14
-              }}
-            >
-              {soundOn ? '🔊 Sound On' : '🔇 Sound Off'}
-            </button>
-            <button
-              onClick={onEndSession}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#ef4444',
-                padding: screenDimensions.deviceType === 'mobile' ? '8px 12px' : '10px 16px',
-                cursor: 'pointer',
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                fontSize: screenDimensions.deviceType === 'mobile' ? 12 : 14
-              }}
-            >
-              🏁 End Session
-            </button>
-          </div>
-        )}
-
-        {/* Timer Bar */}
-        <div style={{
-          position: 'absolute',
-          top: screenDimensions.deviceType === 'mobile' ? 60 : 80,
-          left: 0,
-          right: 0,
-          height: screenDimensions.deviceType === 'mobile' ? 4 : 6,
-          background: 'rgba(255,255,255,0.2)',
-          zIndex: 999
-        }}>
-          <div style={{
-            height: '100%',
-            width: `${progress}%`,
-            background: showFinalWarning ? '#ef4444' : '#22c55e',
-            transition: 'width 1s linear, background 0.3s ease'
-          }} />
-        </div>
-        {/* Final seconds warning */}
-        {showFinalWarning && (
-          <div style={{
-            position: "absolute",
-            top: 60,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 20,
-            background: "#ef4444",
-            color: "#fff",
-            fontWeight: 900,
-            fontSize: 22,
-            borderRadius: 16,
-            padding: "8px 32px",
-            boxShadow: "0 2px 16px #0007",
-            letterSpacing: 1
-          }}>
-             FINAL SECONDS!
-          </div>
-        )}
-        {/* Green flash overlay */}
-        {greenFlash && (
-          <div style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(34,197,94,0.3)",
-            zIndex: 100,
-            pointerEvents: "none",
-            transition: "opacity 0.2s"
-          }} />
-        )}
-        {/* Red flash overlay */}
-        {redFlash && (
-          <div style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(239,68,68,0.4)",
-            zIndex: 100,
-            pointerEvents: "none",
-            transition: "opacity 0.2s"
-          }} />
-        )}
-
-        {/* Fly-in points animation */}
-        {flyIns.map(fly => (
-          <div
-            key={fly.id}
-            style={{
-              position: "absolute",
-              left: fly.x,
-              top: fly.y,
-              fontSize: 32,
-              fontWeight: 900,
-              color: "#FFD600",
-              pointerEvents: "none",
-              zIndex: 200,
-              animation: "flyin 1s cubic-bezier(.23,1.02,.64,.99) forwards"
-            }}
-          >
-            +100 <span role="img" aria-label="star">⭐</span>
-          </div>
-        ))}
-        {/* Meme popup on wrong click */}
-        {memePopup && (
+          {/* CEO/mistress as sprite overlay (adaptive scaling as before) */}
+          {(() => {
+            const minScale = 0.4;
+            const maxScale = 1.0;
+            const crowdTop = 0;
+            const crowdBottom = window.innerHeight;
+            const scale =
+              minScale +
+              ((ceoPos.y - crowdTop) / (crowdBottom - crowdTop)) * (maxScale - minScale);
+            let spriteWidth = 48 * scale;
+            let spriteHeight = 64 * scale;
+            // If zoomed in, increase sprite size to fit kiss-cam
+            if (zoomed) {
+              spriteWidth *= 1.8; // or your chosen multiplier
+              spriteHeight *= 1.8;
+            }
+            return (
+              <img
+                src={CEO_FRAMES[ceoFrame - 1]}
+                alt="CEO and Mistress"
+                style={{
+                  position: "absolute",
+                  left: ceoPos.x - (zoomed ? (spriteWidth - 48 * scale) / 2 : 0),
+                  top: ceoPos.y - (zoomed ? (spriteHeight - 64 * scale) / 2 : 0),
+                  width: spriteWidth,
+                  height: spriteHeight,
+                  imageRendering: "pixelated",
+                  zIndex: 2,
+                  pointerEvents: "none",
+                  animation: ceoPopup ? "ceopopup 0.4s cubic-bezier(.23,1.02,.64,.99)" : undefined
+                }}
+              />
+            );
+          })()}
+          {/* Spotlight zoomed-in area */}
           <div
             style={{
-              position: "absolute",
-              left: memePopup.x - 60,
-              top: memePopup.y - 120,
-              zIndex: 300,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              pointerEvents: "none",
-              animation: "memepopup 1s cubic-bezier(.23,1.02,.64,.99)"
+              position: 'absolute',
+              left: spot.x - SPOTLIGHT_RADIUS,
+              top: spot.y - SPOTLIGHT_RADIUS,
+              width: SPOTLIGHT_RADIUS * 2,
+              height: SPOTLIGHT_RADIUS * 2,
+              borderRadius: '50%',
+              overflow: 'hidden',
+              zIndex: 3,
+              pointerEvents: 'none',
+              boxShadow: '0 0 32px 8px #fff8'
             }}
           >
             <img
-              src={memePopup.img}
-              alt="Meme"
+              src='/crowd-images/crowd_zoomedin1.png'
               style={{
-                width: 120,
-                height: 120,
-                objectFit: "contain",
-                borderRadius: 20,
-                boxShadow: "0 4px 24px #000a"
+                width: '100vw',
+                height: '100vh',
+                objectFit: 'cover',
+                position: 'absolute',
+                left: -spot.x + SPOTLIGHT_RADIUS,
+                top: -spot.y + SPOTLIGHT_RADIUS
               }}
             />
+          </div>
+          {/* Timer Bar */}
+          <div style={{
+            position: 'absolute',
+            top: screenDimensions.deviceType === 'mobile' ? 60 : 80,
+            left: 0,
+            right: 0,
+            height: screenDimensions.deviceType === 'mobile' ? 4 : 6,
+            background: 'rgba(255,255,255,0.2)',
+            zIndex: 999
+          }}>
+            <div style={{
+              height: '100%',
+              width: `${progress}%`,
+              background: showFinalWarning ? '#ef4444' : '#22c55e',
+              transition: 'width 1s linear, background 0.3s ease'
+            }} />
+          </div>
+          {/* Final seconds warning */}
+          {showFinalWarning && (
+            <div style={{
+              position: "absolute",
+              top: 60,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 20,
+              background: "#ef4444",
+              color: "#fff",
+              fontWeight: 900,
+              fontSize: 22,
+              borderRadius: 16,
+              padding: "8px 32px",
+              boxShadow: "0 2px 16px #0007",
+              letterSpacing: 1
+            }}>
+               FINAL SECONDS!
+            </div>
+          )}
+          {/* Green flash overlay */}
+          {greenFlash && (
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              background: "rgba(34,197,94,0.3)",
+              zIndex: 100,
+              pointerEvents: "none",
+              transition: "opacity 0.2s"
+            }} />
+          )}
+          {/* Red flash overlay */}
+          {redFlash && (
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              background: "rgba(239,68,68,0.4)",
+              zIndex: 100,
+              pointerEvents: "none",
+              transition: "opacity 0.2s"
+            }} />
+          )}
+
+          {/* Fly-in points animation */}
+          {flyIns.map(fly => (
             <div
+              key={fly.id}
               style={{
-                marginTop: 8,
-                background: "#181818cc",
-                color: "#fff",
+                position: "absolute",
+                left: fly.x,
+                top: fly.y,
+                fontSize: 32,
                 fontWeight: 900,
-                fontSize: 18,
-                borderRadius: 12,
-                padding: "6px 18px",
-                fontFamily: 'Comic Sans MS, Comic Sans, cursive',
-                textShadow: "2px 2px 8px #000, 0 0 12px #f0f"
+                color: "#FFD600",
+                pointerEvents: "none",
+                zIndex: 200,
+                animation: "flyin 1s cubic-bezier(.23,1.02,.64,.99) forwards"
               }}
             >
-              {memePopup.text}
+              +100 <span role="img" aria-label="star">⭐</span>
             </div>
-          </div>
-        )}
-        {/* Kiss-cam overlay as background */}
-        {kissCam && (
-          <img
-            src="/assets/kiss-cam.png"
-            alt="Kiss Cam Overlay"
-            style={{
-              position: "absolute",
-              left: ceoPos.x - CEO_RADIUS * 1.6,
-              top: ceoPos.y - CEO_RADIUS * 1.6,
-              width: CEO_RADIUS * 3.2,
-              height: CEO_RADIUS * 3.2,
-              zIndex: 8,
-              pointerEvents: "none",
-              animation: "kisscam-pop 0.6s cubic-bezier(.23,1.02,.64,.99)",
-              objectFit: "contain"
-            }}
-          />
-        )}
+          ))}
+          {/* Meme popup on wrong click */}
+          {memePopup && (
+            <div
+              style={{
+                position: "absolute",
+                left: memePopup.x - 60,
+                top: memePopup.y - 120,
+                zIndex: 300,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                pointerEvents: "none",
+                animation: "memepopup 1s cubic-bezier(.23,1.02,.64,.99)"
+              }}
+            >
+              <img
+                src={memePopup.img}
+                alt="Meme"
+                style={{
+                  width: 120,
+                  height: 120,
+                  objectFit: "contain",
+                  borderRadius: 20,
+                  boxShadow: "0 4px 24px #000a"
+                }}
+              />
+              <div
+                style={{
+                  marginTop: 8,
+                  background: "#181818cc",
+                  color: "#fff",
+                  fontWeight: 900,
+                  fontSize: 18,
+                  borderRadius: 12,
+                  padding: "6px 18px",
+                  fontFamily: 'Comic Sans MS, Comic Sans, cursive',
+                  textShadow: "2px 2px 8px #000, 0 0 12px #f0f"
+                }}
+              >
+                {memePopup.text}
+              </div>
+            </div>
+          )}
+          {/* Kiss-cam overlay as background */}
+          {kissCam && (
+            <img
+              src="/assets/kiss-cam.png"
+              alt="Kiss Cam Overlay"
+              style={{
+                position: "absolute",
+                left: ceoPos.x - CEO_RADIUS * 1.6,
+                top: ceoPos.y - CEO_RADIUS * 1.6,
+                width: CEO_RADIUS * 3.2,
+                height: CEO_RADIUS * 3.2,
+                zIndex: 8,
+                pointerEvents: "none",
+                animation: "kisscam-pop 0.6s cubic-bezier(.23,1.02,.64,.99)",
+                objectFit: "contain"
+              }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

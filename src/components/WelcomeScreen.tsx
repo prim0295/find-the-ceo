@@ -110,12 +110,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
       display: "flex",
       flexDirection: "column",
       background: "linear-gradient(135deg, #ff7ce5 0%, #a78bfa 50%, #facc15 100%)",
-      fontFamily: 'Comic Sans MS, Comic Sans, Chalkboard SE, Comic Neue, cursive',
-      overflow: isMobile ? "auto" : "hidden"
+      fontFamily: 'Comic Sans MS, Comic Sans, Chalkboard SE, Comic Neue, Arial Rounded MT Bold, Helvetica Rounded, cursive',
+      overflow: "auto"
     }}>
       {/* Header Section */}
       <div style={{
-        flex: isMobile ? "0 0 auto" : "0 0 30%",
+        flex: isMobile ? "0 0 auto" : "0 0 auto",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -152,7 +152,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         justifyContent: "center",
         gap: isMobile ? 20 : 24,
         padding: isMobile ? "0 20px" : isTablet ? "24px" : "32px",
-        minHeight: isMobile ? "auto" : "50vh"
+        minHeight: isMobile ? "auto" : "auto"
       }}>
         {/* Character Labels */}
         <div style={{
@@ -239,7 +239,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
 
       {/* Footer Section - Start Button */}
       <div style={{
-        flex: isMobile ? "0 0 auto" : "0 0 25%",
+        flex: isMobile ? "0 0 auto" : "0 0 auto",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

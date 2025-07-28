@@ -7,7 +7,7 @@
 
 body {
   font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', cursive;
-  overflow: hidden; /* Prevent scrolling on desktop */
+  overflow: auto; /* Allow scrolling on all devices */
   touch-action: none; /* Prevent zoom/scroll on mobile */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -18,7 +18,7 @@ body {
 #root {
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  overflow: auto; /* Allow scrolling */
 }
 
 /* Mobile-specific fixes */
@@ -27,7 +27,7 @@ body {
     font-size: 16px; /* Keep consistent font size */
     overflow: auto; /* Allow scrolling on mobile */
     touch-action: manipulation; /* Better touch handling */
-    font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', cursive; /* Ensure same font */
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', 'Arial Rounded MT Bold', 'Helvetica Rounded', cursive; /* Better mobile font stack */
   }
   
   #root {
@@ -49,7 +49,7 @@ body {
   
   /* Better mobile spacing */
   * {
-    font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', cursive;
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', 'Arial Rounded MT Bold', 'Helvetica Rounded', cursive;
   }
 }
 
