@@ -16,15 +16,21 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
       '/assets/ceo-mistress-frame2.png',
       '/assets/ceo-mistress-frame3.png',
       '/assets/ceo-mistress-frame4.png',
-      '/crowd-images/crowd3.png',
-      '/crowd-images/crowd3_bg.png',
-      '/crowd-images/crowd3_fg.png'
+      '/crowd-images/crowd3.png'
     ];
 
     let loaded = 0;
     preloadImages.forEach(src => {
       const img = new Image();
       img.onload = () => {
+        loaded++;
+        setLoadedImages(loaded);
+        if (loaded === preloadImages.length) {
+          setLoading(false);
+        }
+      };
+      img.onerror = () => {
+        // Skip failed images and continue
         loaded++;
         setLoadedImages(loaded);
         if (loaded === preloadImages.length) {
@@ -73,7 +79,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
           }} />
         </div>
         <div style={{ color: "#fff", fontSize: 18 }}>
-          Loading assets... {loadedImages}/7
+          Loading assets... {loadedImages}/5
         </div>
       </div>
     );
