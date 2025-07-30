@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { bgMusic, correctSound, wrongSound, preloadAudio } from '../utils/audio';
 import { beepSound } from '../utils/audio'; // Adjust path if needed
 import { isMobile, getScreenDimensions } from '../utils/deviceDetection';
+import { analytics } from '../utils/analytics';
 
 const FLASH_DURATION = 5; // seconds
 const ZOOM = 1.2;
@@ -914,6 +915,13 @@ const GameScreen: React.FC<GameScreenProps> = ({ level, onGameEnd }) => {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ceoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Track game start when flash screen ends
+  useEffect(() => {
+    if (!showFlash) {
+      analytics.trackGameStart(level);
+    }
+  }, [showFlash, level]);
+
   // Preload audio when game starts
   useEffect(() => {
     preloadAudio();
@@ -943,7 +951,14 @@ const GameScreen: React.FC<GameScreenProps> = ({ level, onGameEnd }) => {
       return () => timerRef.current && clearInterval(timerRef.current);
     }
     if (timeLeft <= 0) {
-      onGameEnd(points * 100, { correct, memes, level });
+      const score = points * 100;
+      const stats = { correct, memes, level };
+      const qualified = score >= (1500 + (level - 1) * 200);
+      
+      // Track game end
+      analytics.trackGameEnd(level, score, stats, qualified);
+      
+      onGameEnd(score, stats);
     }
   }, [showFlash, timeLeft, points, correct, memes, level, onGameEnd]);
 
@@ -974,18 +989,32 @@ const GameScreen: React.FC<GameScreenProps> = ({ level, onGameEnd }) => {
     setPoints(p => p + 1);
     setCorrect(c => c + 1);
     if (soundOn) correctSound.play();
+    
+    // Track correct click
+    analytics.trackCorrectClick(level, (points + 1) * 100, { correct: correct + 1, memes });
+    
     // Animation logic handled in SpotlightCanvas
   };
+  
   // Wrong tap handler
   const handleWrongClick = () => {
     setMemes(m => m + 1);
     if (soundOn) wrongSound.play();
+    
+    // Track wrong click
+    analytics.trackWrongClick(level, points * 100, { correct, memes: memes + 1 });
   };
 
   // End session handler
   const handleEndSession = () => {
     setMenuOpen(false);
-    onGameEnd(points * 100, { correct, memes, level });
+    const score = points * 100;
+    const stats = { correct, memes, level };
+    
+    // Track session abandon
+    analytics.trackSessionAbandon(level, score, stats);
+    
+    onGameEnd(score, stats);
   };
 
   if (showFlash) {
