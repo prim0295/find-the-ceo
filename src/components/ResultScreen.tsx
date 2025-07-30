@@ -392,13 +392,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
         {/* Qualification Message */}
         {qualified ? (
           <div style={{
-            background: "linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(22, 163, 74, 0.9) 100%)",
-            border: "3px solid #16a34a",
+            background: "linear-gradient(135deg, rgba(34, 197, 94, 0.7) 0%, rgba(22, 163, 74, 0.7) 50%, rgba(16, 185, 129, 0.7) 100%)",
+            border: "3px solid rgba(22, 163, 74, 0.8)",
             borderRadius: isMobile ? 12 : 16,
             padding: isMobile ? 16 : 20,
             marginBottom: isMobile ? 24 : 32,
             maxWidth: isMobile ? "100%" : "600px",
-            backdropFilter: "blur(10px)"
+            backdropFilter: "blur(15px)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
           }}>
             <div style={{
               color: "#fff",
@@ -417,13 +418,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
           </div>
         ) : (
           <div style={{
-            background: "linear-gradient(135deg, rgba(251, 191, 36, 0.9) 0%, rgba(245, 158, 11, 0.9) 100%)",
-            border: "3px solid #f59e0b",
+            background: "linear-gradient(135deg, rgba(251, 191, 36, 0.7) 0%, rgba(245, 158, 11, 0.7) 50%, rgba(239, 68, 68, 0.7) 100%)",
+            border: "3px solid rgba(245, 158, 11, 0.8)",
             borderRadius: isMobile ? 12 : 16,
             padding: isMobile ? 16 : 20,
             marginBottom: isMobile ? 24 : 32,
             maxWidth: isMobile ? "100%" : "600px",
-            backdropFilter: "blur(10px)"
+            backdropFilter: "blur(15px)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
           }}>
             <div style={{
               color: "#fff",
