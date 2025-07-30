@@ -39,7 +39,7 @@ class AnalyticsService {
     this.startTime = Date.now();
     // Use production URL when deployed, localhost for development
     this.apiBaseUrl = import.meta.env.VITE_API_URL || 
-      (window.location.hostname === 'localhost' ? 'http://localhost:4000' : 'https://your-app-name.railway.app');
+      (window.location.hostname === 'localhost' ? 'http://localhost:4000' : 'https://find-the-ceo-backend.onrender.com');
   }
 
   private generateSessionId(): string {
