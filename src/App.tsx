@@ -16,9 +16,13 @@ const App = () => {
   };
 
   const handleRestart = () => {
-    // Increment level when restarting (user qualified)
-    setStats(prev => ({ ...prev, level: prev.level + 1 }));
+    // Only increment level when user qualified (this will be handled in ResultScreen)
     setScreen("game");
+  };
+
+  const handleLevelUp = () => {
+    // Increment level when user qualifies
+    setStats(prev => ({ ...prev, level: prev.level + 1 }));
   };
 
   const handleBackToWelcome = () => {
@@ -44,6 +48,7 @@ const App = () => {
           stats={stats}
           onRestart={handleRestart}
           onBackToWelcome={handleBackToWelcome}
+          onLevelUp={handleLevelUp}
         />
       )}
     </>

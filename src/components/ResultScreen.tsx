@@ -7,6 +7,7 @@ interface ResultScreenProps {
   stats: { correct: number; memes: number; level: number };
   onRestart: () => void;
   onBackToWelcome: () => void;
+  onLevelUp?: () => void; // New prop for level progression
 }
 
 const BASE_QUALIFY_SCORE = 500;
@@ -20,7 +21,7 @@ const FAIL_MESSAGES = [
   "Try again, legend. This time, maybe try using your eyes instead of your vibes."
 ];
 
-const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, onBackToWelcome }) => {
+const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, onBackToWelcome, onLevelUp }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareImage, setShareImage] = useState<string | null>(null);
   
@@ -31,6 +32,14 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
   const screenDimensions = getScreenDimensions();
   const isMobile = screenDimensions.deviceType === 'mobile';
   const isTablet = screenDimensions.deviceType === 'tablet';
+
+  const handleRestart = () => {
+    if (qualified && onLevelUp) {
+      // User qualified - advance to next level
+      onLevelUp();
+    }
+    onRestart();
+  };
 
   const generateShareText = () => {
     const baseText = `I scored ${score} points on Spot the CEO (Level ${stats.level})! Can you beat my meme skills? 😂🎯`;
@@ -383,12 +392,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
         {/* Qualification Message */}
         {qualified ? (
           <div style={{
-            background: "rgba(34, 197, 94, 0.9)",
+            background: "linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(22, 163, 74, 0.9) 100%)",
             border: "3px solid #16a34a",
             borderRadius: isMobile ? 12 : 16,
             padding: isMobile ? 16 : 20,
             marginBottom: isMobile ? 24 : 32,
-            maxWidth: isMobile ? "100%" : "600px"
+            maxWidth: isMobile ? "100%" : "600px",
+            backdropFilter: "blur(10px)"
           }}>
             <div style={{
               color: "#fff",
@@ -407,12 +417,13 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
           </div>
         ) : (
           <div style={{
-            background: "rgba(251, 191, 36, 0.9)",
+            background: "linear-gradient(135deg, rgba(251, 191, 36, 0.9) 0%, rgba(245, 158, 11, 0.9) 100%)",
             border: "3px solid #f59e0b",
             borderRadius: isMobile ? 12 : 16,
             padding: isMobile ? 16 : 20,
             marginBottom: isMobile ? 24 : 32,
-            maxWidth: isMobile ? "100%" : "600px"
+            maxWidth: isMobile ? "100%" : "600px",
+            backdropFilter: "blur(10px)"
           }}>
             <div style={{
               color: "#fff",
@@ -458,7 +469,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
         }}>
           {qualified ? (
             <button
-              onClick={onRestart}
+              onClick={handleRestart}
               style={{
                 background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
                 border: "3px solid #fff",
@@ -482,7 +493,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
             </button>
           ) : (
             <button
-              onClick={onRestart}
+              onClick={handleRestart}
               style={{
                 background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
                 border: "3px solid #fff",
