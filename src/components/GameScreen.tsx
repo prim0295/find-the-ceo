@@ -280,7 +280,12 @@ const SpotlightCanvas: React.FC<{
     { img: "/assets/meme1.png", text: "gotcha you fool!" },
     { img: "/assets/meme2.png", text: "Oh no, need espresso?" },
     { img: "/assets/meme3.png", text: "no Senorita, not here" },
-    { img: "/assets/meme4.png", text: "You're a bad guyy ;)" }
+    { img: "/assets/meme4.png", text: "You're a bad guyy ;)" },
+    { img: "/assets/meme5.png", text: "Nice try, but no cigar!" },
+    { img: "/assets/meme6.png", text: "Wrong again, Sherlock!" },
+    { img: "/assets/meme7.png", text: "Not even close, buddy!" },
+    { img: "/assets/meme8.png", text: "You're really bad at this!" },
+    { img: "/assets/meme9.png", text: "Maybe try using your eyes?" }
   ];
 
   // Update screen dimensions on resize
