@@ -334,21 +334,16 @@ const SpotlightCanvas: React.FC<{
       e.preventDefault(); // Prevent scrolling
       handleMove(e);
     };
-    const handleTouchStart = (e: TouchEvent) => {
-      e.preventDefault(); // Prevent scrolling
-    };
 
     // Add event listeners
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchstart', handleTouchStart, { passive: false });
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchstart', handleTouchStart);
     };
-  }, [animating, zoomed]);
+  }, [handleMove]);
 
   // Red flash effect
   useEffect(() => {
@@ -440,6 +435,30 @@ const SpotlightCanvas: React.FC<{
       clientY = e.clientY - rect.top;
       executeGameAction(clientX, clientY);
     }
+  };
+
+  // Touch start handler for mobile
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (animating || zoomed) return; // Block input during animation
+    
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    const touch = e.touches[0];
+    const clientX = touch.clientX - rect.left;
+    const clientY = touch.clientY - rect.top;
+    
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300; // 300ms for double tap
+    
+    if (now - lastTap < DOUBLE_TAP_DELAY) {
+      // Double tap detected - execute game action
+      executeGameAction(clientX, clientY);
+      setTapCount(0);
+    } else {
+      // Single tap - just move spotlight
+      setSpot({ x: clientX, y: clientY });
+      setTapCount(1);
+    }
+    setLastTap(now);
   };
 
   // Execute the actual game action (hit detection)
@@ -668,7 +687,7 @@ const SpotlightCanvas: React.FC<{
           cursor: "crosshair"
         }}
         onClick={handleClick}
-        onTouchEnd={handleClick}
+        onTouchStart={handleTouchStart}
       >
         {/* Main game zoom container */}
         <div style={{ width: '100vw', height: '100vh', ...zoomStyle, position: 'absolute', left: 0, top: 0 }}>
