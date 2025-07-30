@@ -52,7 +52,8 @@ const FlashScreen = ({ onDone }: { onDone: () => void }) => {
       alignItems: "center",
       justifyContent: "center",
       position: "relative",
-      overflow: "hidden"
+      overflow: "hidden",
+      fontFamily: 'Comic Sans MS, Comic Sans, Ayuthaya, Arial Rounded MT Bold, Chalkboard SE, Chalkboard, Congenial, cursive'
     }}>
       {/* Animated background circles */}
       <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
@@ -116,40 +117,6 @@ const FlashScreen = ({ onDone }: { onDone: () => void }) => {
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span>🔦</span><span>Move your spotlight</span></div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span>⏰</span><span>30 seconds only!</span></div>
             </div>
-            
-            {/* Mobile-specific instructions */}
-            {isMobile() && (
-              <div style={{
-                background: "rgba(255,255,255,0.1)",
-                borderRadius: 16,
-                padding: 16,
-                marginTop: 16,
-                border: "2px solid #FFD600"
-              }}>
-                <p style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  color: "#FFD600",
-                  marginBottom: 8
-                }}>
-                  📱 Mobile Controls:
-                </p>
-                <div style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 8,
-                  fontSize: 14,
-                  color: "#fff"
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span>👆</span><span>Single tap to move spotlight</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span>👆👆</span><span>Double tap to shoot at CEO/Mistress</span>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -543,7 +510,7 @@ const SpotlightCanvas: React.FC<{
       position: "relative",
       overflow: "hidden",
       background: "linear-gradient(135deg, #ff7ce5 0%, #a78bfa 50%, #facc15 100%)",
-      fontFamily: 'Comic Sans MS, Comic Sans, Chalkboard SE, Comic Neue, Arial Rounded MT Bold, Helvetica Rounded, cursive'
+      fontFamily: 'Comic Sans MS, Comic Sans, Ayuthaya, Arial Rounded MT Bold, Chalkboard SE, Chalkboard, Congenial, cursive'
     }}>
       {/* Top UI Bar */}
       <div style={{
@@ -879,7 +846,7 @@ const SpotlightCanvas: React.FC<{
                   fontSize: 18,
                   borderRadius: 12,
                   padding: "6px 18px",
-                  fontFamily: 'Comic Sans MS, Comic Sans, cursive',
+                  fontFamily: 'Comic Sans MS, Comic Sans, Ayuthaya, Arial Rounded MT Bold, Chalkboard SE, Chalkboard, Congenial, cursive',
                   textShadow: "2px 2px 8px #000, 0 0 12px #f0f"
                 }}
               >

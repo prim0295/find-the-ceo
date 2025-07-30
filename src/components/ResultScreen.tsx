@@ -9,7 +9,8 @@ interface ResultScreenProps {
   onBackToWelcome: () => void;
 }
 
-const QUALIFY_SCORE = 1500;
+const BASE_QUALIFY_SCORE = 500;
+const QUALIFY_SCORE_INCREMENT = 200;
 
 const FAIL_MESSAGES = [
   "Your spotting skills are so bad, even the CEO filed a restraining order—he doesn't want to be found by you.",
@@ -22,7 +23,10 @@ const FAIL_MESSAGES = [
 const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, onBackToWelcome }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareImage, setShareImage] = useState<string | null>(null);
-  const qualified = score >= QUALIFY_SCORE;
+  
+  // Calculate qualification score based on level
+  const qualifyScore = BASE_QUALIFY_SCORE + (stats.level - 1) * QUALIFY_SCORE_INCREMENT;
+  const qualified = score >= qualifyScore;
   const failMessage = FAIL_MESSAGES[Math.floor(Math.random() * FAIL_MESSAGES.length)];
   const screenDimensions = getScreenDimensions();
   const isMobile = screenDimensions.deviceType === 'mobile';
@@ -254,9 +258,9 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
         }}>
           💡 Tip: For Instagram & TikTok, download the image and post it to your story or feed!
         </div>
-      </div>
     </div>
-  );
+  </div>
+);
 
   return (
     <>
@@ -269,7 +273,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
           alignItems: "center",
           justifyContent: "center",
           background: "linear-gradient(135deg, #ff7ce5 0%, #a78bfa 50%, #facc15 100%)",
-          fontFamily: 'Comic Sans MS, Comic Sans, cursive',
+          fontFamily: 'Comic Sans MS, Comic Sans, Ayuthaya, Arial Rounded MT Bold, Chalkboard SE, Chalkboard, Congenial, cursive',
           padding: isMobile ? 16 : isTablet ? 24 : 32,
           textAlign: "center",
           overflow: "hidden"
@@ -284,7 +288,7 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
             marginBottom: isMobile ? 12 : 16
           }}
         >
-          🎉 Session Complete! 🎉
+          {qualified ? "🎉 Session Complete! 🎉" : "👎 You Lost 👎"}
         </h1>
         <div style={{ 
           fontSize: isMobile ? 18 : isTablet ? 20 : 24, 
@@ -403,8 +407,8 @@ const ResultScreen: React.FC<ResultScreenProps> = ({ score, stats, onRestart, on
           </div>
         ) : (
           <div style={{
-            background: "rgba(239, 68, 68, 0.9)",
-            border: "3px solid #dc2626",
+            background: "rgba(251, 191, 36, 0.9)",
+            border: "3px solid #f59e0b",
             borderRadius: isMobile ? 12 : 16,
             padding: isMobile ? 16 : 20,
             marginBottom: isMobile ? 24 : 32,

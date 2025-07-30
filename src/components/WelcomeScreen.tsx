@@ -66,7 +66,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         alignItems: "center",
         justifyContent: "center",
         background: "linear-gradient(135deg, #ff7ce5 0%, #a78bfa 50%, #facc15 100%)",
-        fontFamily: 'Comic Sans MS, Comic Sans, cursive',
+      fontFamily: 'Comic Sans MS, Comic Sans, cursive',
         padding: screenDimensions.deviceType === 'mobile' ? 16 : 32,
         textAlign: "center"
       }}>
@@ -110,15 +110,15 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
       display: "flex",
       flexDirection: "column",
       background: "linear-gradient(135deg, #ff7ce5 0%, #a78bfa 50%, #facc15 100%)",
-      fontFamily: 'Comic Sans MS, Comic Sans, Chalkboard SE, Comic Neue, Arial Rounded MT Bold, Helvetica Rounded, cursive',
+      fontFamily: 'Comic Sans MS, Comic Sans, Ayuthaya, Arial Rounded MT Bold, Chalkboard SE, Chalkboard, Congenial, cursive',
       overflow: "auto"
     }}>
       {/* Header Section */}
       <div style={{
         flex: isMobile ? "0 0 auto" : "0 0 auto",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
         justifyContent: "center",
         padding: isMobile ? "24px 20px 16px" : isTablet ? "30px 24px" : "40px 32px",
         textAlign: "center"
@@ -132,7 +132,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
           animation: "bounce 2s infinite"
         }}>
           WHERE'S THE CEO?
-        </h1>
+    </h1>
         <div style={{ 
           fontSize: isMobile ? 14 : isTablet ? 16 : 20, 
           color: "#fff", 
@@ -222,10 +222,10 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
           textAlign: "center",
           marginBottom: isMobile ? 20 : 20
         }}>
-          <img
-            src="/assets/ceo-mistress-frame2.png"
-            alt="CEO and Mistress"
-            style={{
+    <img
+      src="/assets/ceo-mistress-frame2.png"
+      alt="CEO and Mistress"
+      style={{
               width: isMobile ? 140 : isTablet ? 160 : 200,
               height: "auto",
               borderRadius: isMobile ? 16 : 16,
@@ -245,9 +245,9 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
         justifyContent: "center",
         padding: isMobile ? "20px" : isTablet ? "24px" : "32px"
       }}>
-        <button
-          onClick={onStart}
-          style={{
+    <button
+      onClick={onStart}
+      style={{
             background: "linear-gradient(135deg, #facc15 0%, #f59e0b 100%)",
             border: "3px solid #fff",
             borderRadius: isMobile ? 16 : 16,
@@ -255,14 +255,14 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
             color: "#18181b",
             fontWeight: "bold",
             fontSize: isMobile ? 18 : isTablet ? 20 : 24,
-            cursor: "pointer",
+        cursor: "pointer",
             display: "flex",
             alignItems: "center",
             gap: 8,
             boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
             animation: "bounce 2s infinite",
             transition: "transform 0.2s ease"
-          }}
+      }}
           onMouseEnter={(e) => {
             (e.target as HTMLElement).style.transform = "scale(1.05)";
           }}
@@ -273,10 +273,10 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
           <span style={{ fontSize: isMobile ? 20 : 22 }}>🚀</span>
           START HUNTING!
           <span style={{ fontSize: isMobile ? 20 : 22 }}>🚀</span>
-        </button>
-      </div>
+      </button>
     </div>
-  );
+  </div>
+);
 };
 
 export default WelcomeScreen;
