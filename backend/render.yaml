@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: spot-the-ceo-backend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb+srv://menonpriyanka92:AgeuWYfJ3DHQyBvg@cluster0.salxsey.mongodb.net/spot-the-ceo?retryWrites=true&w=majority&appName=Cluster0
+      - key: NODE_ENV
+        value: production 
