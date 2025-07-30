@@ -27,7 +27,7 @@ body {
     font-size: 16px; /* Keep consistent font size */
     overflow: auto; /* Allow scrolling on mobile */
     touch-action: manipulation; /* Better touch handling */
-    font-family: 'Comic Sans MS', 'Comic Sans', 'Ayuthaya', 'Arial Rounded MT Bold', 'Chalkboard SE', 'Chalkboard', 'Congenial', cursive; /* Better mobile font stack */
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Ayuthaya', 'Arial Rounded MT Bold', 'Chalkboard SE', 'Chalkboard', 'Congenial', cursive !important; /* Force font with !important */
   }
   
   #root {
@@ -47,9 +47,14 @@ body {
     -ms-text-size-adjust: 100%;
   }
   
-  /* Better mobile spacing */
+  /* Better mobile spacing - force font on all elements */
   * {
-    font-family: 'Comic Sans MS', 'Comic Sans', 'Ayuthaya', 'Arial Rounded MT Bold', 'Chalkboard SE', 'Chalkboard', 'Congenial', cursive;
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Ayuthaya', 'Arial Rounded MT Bold', 'Chalkboard SE', 'Chalkboard', 'Congenial', cursive !important;
+  }
+  
+  /* Ensure specific elements use the font */
+  h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea {
+    font-family: 'Comic Sans MS', 'Comic Sans', 'Ayuthaya', 'Arial Rounded MT Bold', 'Chalkboard SE', 'Chalkboard', 'Congenial', cursive !important;
   }
 }
 

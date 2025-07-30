@@ -8,7 +8,7 @@ const ZOOM = 1.2;
 const SPOTLIGHT_RADIUS = 120;
 
 // --- Figma-inspired FlashScreen with inline styles ---
-const FlashScreen = ({ onDone }: { onDone: () => void }) => {
+const FlashScreen = ({ onDone, level }: { onDone: () => void; level: number }) => {
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
@@ -104,6 +104,22 @@ const FlashScreen = ({ onDone }: { onDone: () => void }) => {
             }}>
               Find the CEO and his Mistress as many times as possible to score maximum points!
             </p>
+            <div style={{
+              background: "rgba(255,255,255,0.1)",
+              borderRadius: 16,
+              padding: 16,
+              marginBottom: 16,
+              border: "2px solid #FFD600"
+            }}>
+              <p style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                color: "#FFD600",
+                margin: 0
+              }}>
+                🎮 Level {level} - Difficulty: {level <= 5 ? `${6-level}s intervals` : '1s intervals'}
+              </p>
+            </div>
             <div style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
@@ -879,6 +895,7 @@ const SpotlightCanvas: React.FC<{
 };
 
 interface GameScreenProps {
+  level: number;
   onGameEnd: (score: number, stats: { correct: number; memes: number; level: number }) => void;
 }
 
@@ -886,10 +903,9 @@ const TOTAL_TIME = 30;
 const LEVEL_INTERVALS = [5, 4, 3, 2, 1]; // seconds for each level
 const QUALIFY_SCORE = 1500;
 
-const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd }) => {
+const GameScreen: React.FC<GameScreenProps> = ({ level, onGameEnd }) => {
   const [showFlash, setShowFlash] = useState(true);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
-  const [level, setLevel] = useState(1);
   const [points, setPoints] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [memes, setMemes] = useState(0);
@@ -973,7 +989,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ onGameEnd }) => {
   };
 
   if (showFlash) {
-    return <FlashScreen onDone={() => setShowFlash(false)} />;
+    return <FlashScreen onDone={() => setShowFlash(false)} level={level} />;
   }
   return (
     <>
